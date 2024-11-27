@@ -28,15 +28,15 @@ exports.addExpense = async (req, res) => {
 
 // Get Incomes
 exports.getExpenses = async (req, res) => {
-  const userId = req.user._id; // Extract userId from the authenticated user
-
+  // const userId = req.user._id; // Extract userId from the authenticated user
+  // console.log(userId);
   try {
     // Query database for incomes that belong to the authenticated user
     const expenses = await Expense.find({ userId }).sort({ createdAt: -1 });
 
     // If no incomes are found, return an empty array
     if (!expenses.length) {
-      return res.status(200).json({ message: 'No incomes found', data: [] });
+      return res.status(404).json({ message: 'No expenses found', data: [] });
     }
 
     // Respond with the fetched incomes

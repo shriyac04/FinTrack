@@ -13,7 +13,7 @@ router.post('/add-income', authenticate, validateRequest, addIncome);
 router.get('/get-incomes', authenticate, getIncomes); // Supports pagination with query params
   
 router.post('/add-expense', authenticate, validateRequest, addExpense);
-router.get('/get-expenses', authenticate, getExpenses); // Supports pagination with query params
+router.get('/get-expenses', getExpenses); // Supports pagination with query params
   
   router.get('/incomes', authenticate, getUserIncomes);
   router.get('/expenses', authenticate, getUserExpenses);

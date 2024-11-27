@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import NavBar from "../components/NavBar"; // Import NavBar
 import Sidebar from "../components/Sidebar"; // Import Sidebar
-import { addExpense, getExpenses, deleteExpense } from "../services/api"; // Import Expense API
+import { addExpense, getExpenses, deleteExpense, getUserExpenses } from "../services/api"; // Import Expense API
 import {
   Chart as ChartJS,
   BarElement,
@@ -34,9 +34,9 @@ const ExpensePage = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await getExpenses();
+      const response = await getUserExpenses();
       const expenses = response.data.data || [];
-      console.log(expenses);
+      console.log(response);
       setExpenses(expenses);
       setTotalExpense(expenses.reduce((sum, exp) => sum + exp.amount, 0));
       const monthly = Array(12).fill(0);
@@ -50,7 +50,8 @@ const ExpensePage = () => {
     }
   };
 
-  const handleAddExpense = async () => {
+  const handleAddExpense = async (e) => {
+    e.preventDefault();
     if (
       !form.title ||
       !form.amount ||
@@ -188,7 +189,7 @@ const ExpensePage = () => {
               />
               <button
                 type="button"
-                onClick={handleAddExpense}
+                onClick={(e)=>{handleAddExpense(e)}}
                 className="w-full bg-red-600 text-white py-2 rounded"
               >
                 Add Expense
