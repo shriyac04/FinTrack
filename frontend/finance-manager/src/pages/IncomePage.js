@@ -22,7 +22,9 @@ const IncomePage = () => {
     const fetchIncomes = async () => {
         try {
             const response = await getIncomes();
-            const incomes = response.data || [];
+            console.log("response ",response);
+            const incomes = response.data.data || [];
+            console.log(incomes);
             setIncome(incomes);
             setTotalIncome(incomes.reduce((sum, inc) => sum + inc.amount, 0));
             const monthly = Array(12).fill(0);

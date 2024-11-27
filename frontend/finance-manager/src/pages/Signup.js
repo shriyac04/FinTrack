@@ -25,11 +25,11 @@ function Signup() {
       const { user, token } = response.data; // Extract user and token from backend response
 
       // Save token to localStorage
-      localStorage.setItem('token', token);
+      // localStorage.setItem('token', token);
 
       alert(`Signup successful! Welcome, ${user.name}.`);
       setLoading(false); // Stop loading
-      navigate('/dashboard', { state: { user } }); // Redirect to dashboard with user data
+      navigate('/login', { state: { user } }); // Redirect to dashboard with user data
     } catch (error) {
       setLoading(false); // Stop loading
       const errorMessage =

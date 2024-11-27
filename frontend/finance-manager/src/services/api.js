@@ -18,7 +18,7 @@ API.interceptors.request.use((req) => {
 // Auth APIs
 export const signup = (data) => API.post('/signup', data);
 export const login = (data) => API.post('/login', data);
-
+export const userData = () => API.get('/profile')
 // Income APIs
 export const addIncome = (data) => API.post('/add-income', data);
 export const getIncomes = () => API.get('/incomes');
@@ -26,7 +26,7 @@ export const deleteIncome = (id) => API.delete(`/incomes/${id}`);
 export const getUserIncomes = () => API.get('/incomes');
 
 // Expense APIs
-export const addExpense = (data) => API.post('/get-expense', data);
-export const getExpenses = () => API.get('/expenses');
+export const addExpense = (data) => API.post('/add-expense', data);
+export const getExpenses = () => API.get('/get-expenses');
 export const deleteExpense = (id) => API.delete(`/expenses/${id}`);
 export const getUserExpenses = () => API.get('/expenses');

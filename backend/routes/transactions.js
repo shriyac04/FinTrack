@@ -9,12 +9,11 @@ const { deleteIncome } = require('../controllers/income');
 const { deleteExpense } = require('../controllers/expense');
 const router = express.Router();
 
-router
-  .post('/add-income', authenticate, validateRequest, addIncome)
-  .get('/get-incomes', authenticate, getIncomes) // Supports pagination with query params
+router.post('/add-income', authenticate, validateRequest, addIncome);
+router.get('/get-incomes', authenticate, getIncomes); // Supports pagination with query params
   
-  .post('/add-expense', authenticate, validateRequest, addExpense)
-  .get('/get-expenses', authenticate, getExpenses) // Supports pagination with query params
+router.post('/add-expense', authenticate, validateRequest, addExpense);
+router.get('/get-expenses', authenticate, getExpenses); // Supports pagination with query params
   
   router.get('/incomes', authenticate, getUserIncomes);
   router.get('/expenses', authenticate, getUserExpenses);

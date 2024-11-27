@@ -54,10 +54,44 @@ exports.signup = async (req, res) => {
   }
 };
 
+exports.profile = async (req, res) => {
+  try {
+    // Extract user ID from the JWT
+    const userId = req.user?.id; // Ensure `req.user` is populated by JWT middleware
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: User ID is missing in request' });
+    }
+
+    // Fetch the user profile by ID
+    console.log(userId);
+    const user = await User.findById(userId);
+    console.log(user);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the user profile data
+    res.status(200).json({
+      message: 'User profile fetched successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt, // Include additional fields as needed
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
 // Login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log("login",email,"pass",password)  
   try {
     // Validate required fields
     if (!email || !password) {
@@ -80,7 +114,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '1d' }
     );
 
     // Respond with user data and token

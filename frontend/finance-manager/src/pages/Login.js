@@ -16,9 +16,13 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(formData);
         try {
             const response = await login(formData);
-            const user = response.data.user; // Extract user from the backend response
+            console.log("in login try")
+            const user = response.data.user;
+            localStorage.setItem("token",response.data.token);
+            console.log("usweeeeeeeeee",user) // Extract user from the backend response
             alert('Login successful!');
             navigate('/dashboard', { state: { user } }); // Pass user to the dashboard
         } catch (error) {
