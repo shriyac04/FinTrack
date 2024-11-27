@@ -205,7 +205,7 @@ const ExpensePage = () => {
           >
             <div className="bg-red-500 text-white p-3 rounded-lg mb-4 text-center">
               <h2 className="text-sm font-semibold">Total Expense</h2>
-              <p className="text-xl font-bold">${totalExpense}</p>
+              <p className="text-xl font-bold">₹{totalExpense}</p>
             </div>
             <div className="flex-grow">
               <Bar
@@ -243,7 +243,7 @@ const ExpensePage = () => {
                     <td className="p-2 border">
                       {new Date(exp.date).toLocaleDateString()}
                     </td>
-                    <td className="p-2 border">${exp.amount}</td>
+                    <td className="p-2 border">₹{exp.amount}</td>
                     <td className="p-2 border">{exp.category}</td>
                     <td className="p-2 border text-center">
                       <button

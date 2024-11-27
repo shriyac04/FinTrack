@@ -277,14 +277,14 @@ function Dashboard() {
             style={getCardStyles("income")}
           >
             <h2 className="text-lg font-bold">Total Income</h2>
-            <p className="text-4xl font-extrabold mt-2">${totalIncome}</p>
+            <p className="text-4xl font-extrabold mt-2">₹{totalIncome}</p>
           </div>
           <div
             className="p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
             style={getCardStyles("expense")}
           >
             <h2 className="text-lg font-bold">Total Expense</h2>
-            <p className="text-4xl font-extrabold mt-2">${totalExpense}</p>
+            <p className="text-4xl font-extrabold mt-2">₹{totalExpense}</p>
           </div>
           <div
             className="p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
@@ -292,7 +292,7 @@ function Dashboard() {
           >
             <h2 className="text-lg font-bold">Balance</h2>
             <p className="text-4xl font-extrabold mt-2">
-              ${totalIncome - totalExpense}
+            ₹{totalIncome - totalExpense}
             </p>
           </div>
         </div>

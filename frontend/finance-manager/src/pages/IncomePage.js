@@ -151,7 +151,7 @@ const IncomePage = () => {
                     }`}>
                         <div className="bg-blue-500 text-white p-3 rounded-lg mb-4 text-center">
                             <h2 className="text-sm font-semibold">Total Income</h2>
-                            <p className="text-xl font-bold">${totalIncome}</p>
+                            <p className="text-xl font-bold">₹{totalIncome}</p>
                         </div>
                         <div className="flex-grow">
                             <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
@@ -179,7 +179,7 @@ const IncomePage = () => {
                                 <tr key={inc._id} className="hover:bg-blue-50">
                                     <td className="p-2 border">{inc.title}</td>
                                     <td className="p-2 border">{new Date(inc.date).toLocaleDateString()}</td>
-                                    <td className="p-2 border">${inc.amount}</td>
+                                    <td className="p-2 border">₹{inc.amount}</td>
                                     <td className="p-2 border">{inc.category}</td>
                                     <td className="p-2 border text-center">
                                         <button
