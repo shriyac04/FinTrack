@@ -1,11 +1,12 @@
 const express = require('express');
-const { addExpense, getExpenses, deleteExpense } = require('../controllers/expense');
-const { addIncome, getIncomes, deleteIncome } = require('../controllers/income');
+const { addExpense, getExpenses } = require('../controllers/expense');
+const { addIncome, getIncomes} = require('../controllers/income');
 const { validateRequest } = require('../middleware/validation');
 const { authenticate } = require('../middleware/auth');
 const { getUserIncomes } = require('../controllers/income');
 const { getUserExpenses } = require('../controllers/expense');
-
+const { deleteIncome } = require('../controllers/income');
+const { deleteExpense } = require('../controllers/expense');
 const router = express.Router();
 
 router
@@ -17,4 +18,9 @@ router
   
   router.get('/incomes', authenticate, getUserIncomes);
   router.get('/expenses', authenticate, getUserExpenses);
-module.exports = router;
+  router.delete('/incomes/:id', authenticate, deleteIncome);
+  router.delete('/expenses/:id', authenticate, deleteExpense);
+
+
+
+  module.exports = router;

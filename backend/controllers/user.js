@@ -1,18 +1,18 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/UserModel'); // Ensure this path is correct
+const User = require('../models/UserModel');
 
 // Signup
 exports.signup = async (req, res) => {
-  const { name, email, username, password } = req.body;
+  const { name, username, email, password } = req.body;
 
   try {
     // Validate required fields
-    if (!name || !email || !username || !password) {
+    if (!name || !username || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Check for existing email or username
+    // Check if email or username already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Email or username already exists' });
@@ -21,21 +21,32 @@ exports.signup = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create and save the user
-    const newUser = new User({ name, email, username, password: hashedPassword });
-    const savedUser = await newUser.save();
+    // Create new user
+    const newUser = new User({
+      name,
+      username,
+      email,
+      password: hashedPassword,
+    });
+    await newUser.save();
 
     // Generate JWT
     const token = jwt.sign(
-      { id: savedUser._id, email: savedUser.email },
+      { id: newUser._id, email: newUser.email },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
+    // Respond with user data and token
     res.status(201).json({
       message: 'Signup successful',
       token,
-      user: { id: savedUser._id, name: savedUser.name, username: savedUser.username },
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        username: newUser.username,
+        email: newUser.email,
+      },
     });
   } catch (error) {
     console.error('Error during signup:', error);
@@ -53,13 +64,13 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    // Check if the user exists
+    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Validate the password
+    // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
@@ -72,10 +83,16 @@ exports.login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
+    // Respond with user data and token
     res.status(200).json({
       message: 'Login successful',
       token,
-      user: { id: user._id, name: user.name, username: user.username },
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     console.error('Error during login:', error);
