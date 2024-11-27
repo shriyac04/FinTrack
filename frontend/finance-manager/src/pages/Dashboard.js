@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { getIncomes, getExpenses, userData } from "../services/api";
+import { getIncomes, getExpenses, userData, getUserIncomes, getUserExpenses } from "../services/api";
 import { FaUserCircle, FaSun, FaMoon } from "react-icons/fa";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -39,8 +39,8 @@ function Dashboard() {
       setUserName(userInfo.name);
       setEditableName(userInfo.name);
 
-      const incomeResponse = await getIncomes();
-      const expenseResponse = await getExpenses();
+      const incomeResponse = await getUserIncomes();
+      const expenseResponse = await getUserExpenses();
         // console.log("income Response",incomeResponse);
         // console.log("expense response",expenseResponse);
         const idata = incomeResponse.data.data  || [];
