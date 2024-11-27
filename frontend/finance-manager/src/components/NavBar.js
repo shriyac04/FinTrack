@@ -1,7 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaSun, FaMoon } from 'react-icons/fa';
+import { userData } from '../services/api'; // Replace with the correct import for your API call
 
 const Navbar = ({ isDarkMode, setIsDarkMode, toggleSidebar, sidebarOpen }) => {
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [userName, setUserName] = useState("Guest"); // Default to "Guest" if no user data
+
+    // Fetch user data on mount
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userResponse = await userData();
+                const userInfo = userResponse?.data?.user;
+                if (userInfo) {
+                    setUserName(userInfo.name || "Guest"); // Set user's name or default to "Guest"
+                    console.log("Fetched User Data:", userInfo);
+                } else {
+                    console.warn("No user data found in response.");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error.message);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    // Update clock every second
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(interval); // Clear interval on unmount
+    }, []);
+
+    // Format time and date
+    const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const formattedDate = currentTime.toLocaleDateString();
+
     return (
         <div className="fixed top-0 left-0 w-full bg-[#23275e] text-white flex items-center justify-between px-6 py-3 shadow-md z-30">
             {/* Sidebar Toggle and App Name */}
@@ -15,8 +52,16 @@ const Navbar = ({ isDarkMode, setIsDarkMode, toggleSidebar, sidebarOpen }) => {
                 <h1 className="text-xl font-bold">FinTrack</h1>
             </div>
 
-            {/* Dark Mode Toggle */}
-            <div className="flex items-center space-x-4">
+            {/* User Greeting, Clock, and Dark Mode Toggle */}
+            <div className="flex items-center space-x-6">
+                {/* User Greeting and Clock */}
+                <div className="flex flex-col items-end">
+                <span className="text-white font-bold text-base">Hi, {userName}</span>                    <span className="text-sm">
+                        {formattedDate} | {formattedTime}
+                    </span>
+                </div>
+
+                {/* Dark Mode Toggle */}
                 <label className="relative inline-flex items-center cursor-pointer">
                     <input
                         type="checkbox"

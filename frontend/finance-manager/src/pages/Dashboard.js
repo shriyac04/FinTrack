@@ -4,7 +4,7 @@ import { Doughnut, Pie } from "react-chartjs-2";
 import { getIncomes, getExpenses, userData, getUserIncomes, getUserExpenses } from "../services/api";
 import { FaUserCircle, FaSun, FaMoon } from "react-icons/fa";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
+import { format } from 'date-fns';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
@@ -19,6 +19,7 @@ function Dashboard() {
   const [totalExpense, setTotalExpense] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const [isEditing, setIsEditing] = useState(false);
   const [userName, setUserName] = useState();
@@ -30,36 +31,43 @@ function Dashboard() {
   },[]);
 
   const fetchData = async () => {
-    try {
-      const userResponse = await userData();
-      const userInfo = userResponse.data.user;
-      setUser(userInfo); // Set user data in state
-      setEditableName(userInfo.name); // Set editable name
-      console.log("User Data:", userInfo);
-      setUserName(userInfo.name);
-      setEditableName(userInfo.name);
+  try {
+    const userResponse = await userData();
+    const userInfo = userResponse.data.user;
+    setUser(userInfo); 
+    setEditableName(userInfo.name);
 
-      const incomeResponse = await getUserIncomes();
-      const expenseResponse = await getUserExpenses();
-        // console.log("income Response",incomeResponse);
-        // console.log("expense response",expenseResponse);
-        const idata = incomeResponse.data.data  || [];
-        const edata = expenseResponse.data.data || [];
-        setIncomes(idata);
-        setTotalIncome((idata.reduce((sum, exp) => sum + exp.amount, 0)));
-        setTotalExpense((edata.reduce((sum, exp) => sum + exp.amount, 0)));
-        setExpenses(edata);
-            // setTotalIncome(idata.reduce((sum, inc) => sum + inc.amount, 0));
-    //   setIncomes(incomeResponse.data.data.amount || []);
-    //   setExpenses(expenseResponse.data.data.amount || []);    
-    //   calculateTotals(
-    //     idata || [],
-    //     edata || []
-    //   );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+    const incomeResponse = await getUserIncomes();
+    const expenseResponse = await getUserExpenses();
+
+    const allIncomes = incomeResponse.data.data || [];
+    const allExpenses = expenseResponse.data.data || [];
+
+    // Filter data by currentYear
+    const filteredIncomes = allIncomes.filter(
+      (income) => new Date(income.date).getFullYear() === currentYear
+    );
+    const filteredExpenses = allExpenses.filter(
+      (expense) => new Date(expense.date).getFullYear() === currentYear
+    );
+
+    setIncomes(filteredIncomes);
+    setExpenses(filteredExpenses);
+    setTotalIncome(filteredIncomes.reduce((sum, income) => sum + (income.amount || 0), 0));
+    setTotalExpense(filteredExpenses.reduce((sum, expense) => sum + (expense.amount || 0), 0));
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+  useEffect(() => {
+    fetchData();
+  }, [currentYear]); // Refetch data when currentYear changes
+  
+
+
+
+  
 
   // const calculateTotals = (incomes, expenses) => {
   //     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
@@ -67,6 +75,23 @@ function Dashboard() {
   //     setTotalIncome(totalIncome);
   //     setTotalExpense(totalExpense);
   // };
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+          setCurrentTime(new Date());
+      }, 1000); // Update time every second
+
+      return () => clearInterval(interval); // Clear interval on component unmount
+  }, []);
+
+  // Format time and date
+  const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const formattedDate = currentTime.toLocaleDateString();
+
+
+
+
 
   const calculateTotals = (incomes , expenses) => {
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
@@ -169,6 +194,14 @@ function Dashboard() {
           <h1 className="text-xl font-bold">FinTrack</h1>
         </div>
 
+        {/* Live Clock and Date  with toggle*/}
+        <div className="flex items-center space-x-6">
+                <div className="flex flex-col items-end">
+                    <span className="text-sm font-medium">{formattedDate}</span>
+                    <span className="text-lg font-bold">{formattedTime}</span>
+                </div>
+
+
         {/* Dark Mode Toggle with Icons */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
@@ -190,6 +223,8 @@ function Dashboard() {
             </label>
           </div>
         </div>
+</div>
+
       </div>
 
       {/* Sidebar */}
@@ -264,7 +299,7 @@ function Dashboard() {
             ) : (
               <div>
                 <h2 className="text-2xl font-bold">{user?.name}</h2>
-                <p>Member since {user?.createdAt || "N/A"}</p>
+                <p>Member since {user?.createdAt ? format(new Date(user.createdAt), 'yyyy-MM-dd') : "N/A"}</p>
               </div>
             )}
           </div>
@@ -292,22 +327,88 @@ function Dashboard() {
           >
             <h2 className="text-lg font-bold">Balance</h2>
             <p className="text-4xl font-extrabold mt-2">
-            ₹{totalIncome - totalExpense}
+              ₹{totalIncome - totalExpense}
             </p>
           </div>
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6">
-          <div className="p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg">
-            <h3 className="text-lg font-bold mb-4">Income vs Expenses</h3>
-            <Doughnut data={doughnutData} />
-          </div>
-          <div className="p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg">
-            <h3 className="text-lg font-bold mb-4">Expense Breakdown</h3>
-            <Pie data={pieData} />
-          </div>
-        </div>
+        <div className="p-6 flex items-center justify-end space-x-4">
+  <label htmlFor="year-select" className="text-lg font-semibold"
+  
+  >
+    Select Year:
+  </label>
+  <select
+  id="year-select"
+  value={currentYear}
+  onChange={(e) => setCurrentYear(parseInt(e.target.value, 10))}
+  className={`p-2 border rounded-md ${
+    isDarkMode
+      ? "bg-black text-white border-gray-700"
+      : "bg-white text-black border-gray-300"
+  }`}
+>
+  {Array.from({ length: 10 }, (_, i) => (
+    <option key={i} value={new Date().getFullYear() - i}>
+      {new Date().getFullYear() - i}
+    </option>
+  ))}
+</select>
+
+</div>
+{/* Charts Section */}
+<div className="flex flex-wrap p-4 ml-4">
+  {/* Card 1 */}
+  <div
+    className="p-5 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
+    style={{
+      maxWidth: "400px",
+      height: "400px",
+      overflow: "hidden",
+      marginRight: "20px", // Custom gap between the two cards
+    }}
+  >
+    <h3 className="text-md font-bold mb-2">Income vs Expenses</h3>
+    <Doughnut
+      data={doughnutData}
+      options={{
+        maintainAspectRatio: true,
+        responsive: true,
+      }}
+      style={{
+        maxHeight: "350px",
+        maxWidth: "350px",
+        margin: "0 auto",
+      }}
+    />
+  </div>
+
+  {/* Card 2 */}
+  <div
+    className="p-5 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
+    style={{
+      maxWidth: "400px",
+      height: "400px",
+      overflow: "hidden",
+    }}
+  >
+    <h3 className="text-md font-bold mb-2">Expense Breakdown</h3>
+    <Pie
+      data={pieData}
+      options={{
+        maintainAspectRatio: true,
+        responsive: true,
+      }}
+      style={{
+        maxHeight: "350px",
+        maxWidth: "350px",
+        margin: "0 auto",
+      }}
+    />
+  </div>
+</div>
+
+
       </div>
     </div>
   );

@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import NavBar from "../components/NavBar"; // Import NavBar
 import Sidebar from "../components/Sidebar"; // Import Sidebar
-import { addExpense, getExpenses, deleteExpense, getUserExpenses } from "../services/api"; // Import Expense API
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { addExpense, getUserExpenses, deleteExpense } from "../services/api"; // Import Expense API
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ExpensePage = () => {
   const [expenses, setExpenses] = useState([]);
   const [totalExpense, setTotalExpense] = useState(0);
-  const [monthlyData, setMonthlyData] = useState([]);
+  const [categoryData, setCategoryData] = useState({});
   const [form, setForm] = useState({
     title: "",
     amount: "",
@@ -25,26 +18,39 @@ const ExpensePage = () => {
     category: "",
     description: "",
   });
+  const [filterDate, setFilterDate] = useState(""); // State for filtering data
   const [sidebarOpen, setSidebarOpen] = useState(false); // Sidebar state
   const [isDarkMode, setIsDarkMode] = useState(false); // Dark mode state
 
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [filterDate]); // Re-fetch data when the filter date changes
 
   const fetchExpenses = async () => {
     try {
       const response = await getUserExpenses();
-      const expenses = response.data.data || [];
-      console.log(response);
-      setExpenses(expenses);
-      setTotalExpense(expenses.reduce((sum, exp) => sum + exp.amount, 0));
-      const monthly = Array(12).fill(0);
-      expenses.forEach((exp) => {
-        const month = new Date(exp.date).getMonth();
-        monthly[month] += exp.amount;
+      const allExpenses = response.data.data || [];
+      
+      // Filter expenses based on the selected filterDate (if any)
+      const filteredExpenses = filterDate
+        ? allExpenses.filter((exp) => {
+            const expenseDate = new Date(exp.date).toISOString().slice(0, 7);
+            return expenseDate === filterDate;
+          })
+        : allExpenses;
+
+      setExpenses(filteredExpenses);
+
+      // Calculate total expenses
+      const total = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+      setTotalExpense(total);
+
+      // Prepare category data for the Pie chart
+      const categories = {};
+      filteredExpenses.forEach((exp) => {
+        categories[exp.category] = (categories[exp.category] || 0) + exp.amount;
       });
-      setMonthlyData(monthly);
+      setCategoryData(categories);
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
@@ -86,27 +92,20 @@ const ExpensePage = () => {
     }
   };
 
-  const chartData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+  const pieChartData = {
+    labels: Object.keys(categoryData),
     datasets: [
       {
-        label: "Monthly Expense",
-        data: monthlyData,
-        backgroundColor: "rgba(255, 99, 132, 0.7)",
-        borderWidth: 1,
+        data: Object.values(categoryData),
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+          "#FF9F40",
+        ],
+        hoverOffset: 4,
       },
     ],
   };
@@ -126,7 +125,7 @@ const ExpensePage = () => {
       />
 
       {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} isDarkMode={isDarkMode} />
 
       {/* Main Content */}
       <div
@@ -134,19 +133,23 @@ const ExpensePage = () => {
           sidebarOpen ? "ml-64" : ""
         }`}
       >
-        <h1 className="text-2xl font-bold text-center mb-6 text-red-700">
+        <h1
+          className={`text-2xl font-bold text-center mb-6 ${
+            isDarkMode ? "text-red-400" : "text-red-700"
+          }`}
+        >
           Expense Manager
         </h1>
 
-        {/* Top Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 px-4">
+        {/* Filter and Pie Chart Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 px-4">
           {/* Add Expense Form */}
           <div
             className={`p-4 rounded-lg shadow-md ${
               isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
             }`}
           >
-            <h2 className="text-lg font-semibold text-red-600 mb-4">
+            <h2 className="text-lg font-semibold mb-4 text-red-600">
               Add Expense
             </h2>
             <form className="space-y-4">
@@ -155,7 +158,9 @@ const ExpensePage = () => {
                 placeholder="Title"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  isDarkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+                }`}
               />
               <input
                 type="number"
@@ -164,20 +169,26 @@ const ExpensePage = () => {
                 onChange={(e) =>
                   setForm({ ...form, amount: parseFloat(e.target.value) || "" })
                 }
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  isDarkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+                }`}
               />
               <input
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  isDarkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+                }`}
               />
               <input
                 type="text"
                 placeholder="Category"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  isDarkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+                }`}
               />
               <textarea
                 placeholder="Description"
@@ -185,11 +196,13 @@ const ExpensePage = () => {
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  isDarkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+                }`}
               />
               <button
                 type="button"
-                onClick={(e)=>{handleAddExpense(e)}}
+                onClick={handleAddExpense}
                 className="w-full bg-red-600 text-white py-2 rounded"
               >
                 Add Expense
@@ -197,22 +210,51 @@ const ExpensePage = () => {
             </form>
           </div>
 
-          {/* Stats and Chart */}
+          {/* Pie Chart Section */}
           <div
-            className={`p-4 rounded-lg shadow-md flex flex-col justify-between ${
+            className={`p-4 rounded-lg shadow-md flex flex-col items-center ${
               isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
             }`}
           >
-            <div className="bg-red-500 text-white p-3 rounded-lg mb-4 text-center">
-              <h2 className="text-sm font-semibold">Total Expense</h2>
-              <p className="text-xl font-bold">₹{totalExpense}</p>
-            </div>
-            <div className="flex-grow">
-              <Bar
-                data={chartData}
-                options={{ responsive: true, maintainAspectRatio: false }}
+            <h2 className="text-lg font-semibold text-center mb-4">
+              Category Breakdown
+            </h2>
+            <input
+              type="month"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className={`w-full mb-4 p-2 border rounded ${
+                isDarkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+              }`}
+            />
+            <div className="w-full max-w-xs h-56">
+              <Pie
+                data={pieChartData}
+                options={{
+                  plugins: {
+                    legend: {
+                      labels: {
+                        color: isDarkMode ? "white" : "black",
+                      },
+                    },
+                  },
+                  responsive: true,
+                  maintainAspectRatio: false,
+                }}
               />
             </div>
+          </div>
+
+          {/* Total Expense */}
+          <div
+            className={`p-4 rounded-lg shadow-md flex flex-col justify-center items-center ${
+              isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+            }`}
+          >
+            <h2 className="text-lg font-semibold mb-2 text-red-600">
+              Total Expense
+            </h2>
+            <p className="text-3xl font-bold">₹{totalExpense}</p>
           </div>
         </div>
 
@@ -227,7 +269,7 @@ const ExpensePage = () => {
           </h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-red-100">
+              <tr className={`${isDarkMode ? "bg-gray-700" : "bg-red-100"}`}>
                 <th className="p-2 border">Title</th>
                 <th className="p-2 border">Date</th>
                 <th className="p-2 border">Amount</th>
@@ -236,32 +278,29 @@ const ExpensePage = () => {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(expenses) ? (
-                expenses.map((exp) => (
-                  <tr key={exp._id} className="hover:bg-red-50">
-                    <td className="p-2 border">{exp.title}</td>
-                    <td className="p-2 border">
-                      {new Date(exp.date).toLocaleDateString()}
-                    </td>
-                    <td className="p-2 border">₹{exp.amount}</td>
-                    <td className="p-2 border">{exp.category}</td>
-                    <td className="p-2 border text-center">
-                      <button
-                        onClick={() => handleDeleteExpense(exp._id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center text-gray-500">
-                    No expenses found.
+              {expenses.map((exp) => (
+                <tr
+                  key={exp._id}
+                  className={`hover:${
+                    isDarkMode ? "bg-gray-600" : "bg-red-50"
+                  }`}
+                >
+                  <td className="p-2 border">{exp.title}</td>
+                  <td className="p-2 border">
+                    {new Date(exp.date).toLocaleDateString()}
+                  </td>
+                  <td className="p-2 border">₹{exp.amount}</td>
+                  <td className="p-2 border">{exp.category}</td>
+                  <td className="p-2 border text-center">
+                    <button
+                      onClick={() => handleDeleteExpense(exp._id)}
+                      className="bg-red-500 text-white px-2 py-1 rounded"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
           {expenses.length === 0 && (

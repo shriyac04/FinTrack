@@ -7,6 +7,9 @@ import TeamMemberCard from '../components/Team';
 import ProductCard from '../components/ProductCard';
 import profileimage from '../images/profile1.png';
 import profileimage2 from '../images/profile2.png';
+import profileimage3 from '../images/profile3.png';
+import profileimage4 from '../images/profile4.png';
+
 
 function Home() {
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -47,7 +50,7 @@ function Home() {
         className="flex items-center space-x-4 cursor-pointer"
         onClick={() => scrollToSection('home')}
     >
-        {/* <img src={logo} alt="Financify Logo" className="w-[50px] h-[50px] object-contain" /> */}
+        
         <h1 className="text-xl font-bold">FinTrack</h1>
     
     </div>
@@ -177,7 +180,7 @@ function Home() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
         >
-            Meet the dedicated team behind Financify, committed to helping you achieve your financial goals.
+            Meet the dedicated team behind FinTrack, committed to helping you achieve your financial goals.
         </motion.p>
 
         {/* Flexbox Layout */}
