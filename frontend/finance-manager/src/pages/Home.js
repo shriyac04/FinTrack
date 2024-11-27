@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TeamMemberCard from '../components/Team';
 import ProductCard from '../components/ProductCard';
+import profileimage from '../images/profile1.png';
+import profileimage2 from '../images/profile2.png';
 
 function Home() {
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -20,10 +22,10 @@ function Home() {
     };
 
     const teamMembers = [
-        { name: 'Shriya Choudhary', position: 'Full Stack Developer', description: 'Visionary leader with 10+ years in financial technology.', image: 'https://via.placeholder.com/150' },
-        { name: 'Shruti', position: 'Full Stack Developer', description: 'Tech enthusiast driving innovation in finance.', image: 'https://via.placeholder.com/150' },
-        { name: 'Saurabh Priyadarshi', position: 'Full Stack Developer', description: 'Bringing ideas to life with seamless project management.', image: 'https://via.placeholder.com/150' },
-        { name: 'Saurabh', position: 'Full Stack Developer', description: 'Expert in digital marketing and branding.', image: 'https://via.placeholder.com/150' }
+        { name: 'Shriya Choudhary', position: 'Full Stack Developer', description: 'Visionary leader with years of experience in financial technology.', image:profileimage },
+        { name: 'Shruti', position: 'Full Stack Developer', description: 'Tech enthusiast driving innovation in finance.', image: profileimage },
+        { name: 'Saurabh Priyadarshi', position: 'Full Stack Developer', description: 'Bringing ideas to life with seamless project management.', image: profileimage2 },
+        { name: 'Saurabh', position: 'Full Stack Developer', description: 'Expert in digital marketing and branding.', image: profileimage2}
     ];
 
     const products = [
@@ -45,7 +47,9 @@ function Home() {
         className="flex items-center space-x-4 cursor-pointer"
         onClick={() => scrollToSection('home')}
     >
-        <img src={logo} alt="Financify Logo" className="w-[50px] h-[50px] object-contain" />
+        {/* <img src={logo} alt="Financify Logo" className="w-[50px] h-[50px] object-contain" /> */}
+        <h1 className="text-xl font-bold">FinTrack</h1>
+    
     </div>
 
     {/* Navigation Links */}
@@ -96,7 +100,7 @@ function Home() {
 </div>
 
             {/* Page Content */}
-            <div className="pt-[70px]">
+            <div className="pt-[50px]">
                 {/* Welcome Section */}
                 <div
             id="home"
@@ -120,7 +124,7 @@ function Home() {
                     }}
                 >
                     <br />
-                    Welcome to Financify
+                    Welcome to FinTrack
                 </motion.h1>
 
                 {/* Smooth Fade and Slide-In for Paragraph */}
@@ -296,15 +300,15 @@ function Home() {
             >
                 <div className="flex items-center">
                     <i className="fas fa-phone-alt text-blue-300 text-2xl mr-4"></i>
-                    <p className="text-lg">+1 234 567 890</p>
+                    <p className="text-lg">08888888888</p>
                 </div>
                 <div className="flex items-center">
                     <i className="fas fa-envelope text-blue-300 text-2xl mr-4"></i>
-                    <p className="text-lg">support@financify.com</p>
+                    <p className="text-lg">support@fintrack.com</p>
                 </div>
                 <div className="flex items-center">
                     <i className="fas fa-map-marker-alt text-blue-300 text-2xl mr-4"></i>
-                    <p className="text-lg">123 Finance St, Money City, Wealthyland</p>
+                    <p className="text-lg">Chitkara University, Punjab</p>
                 </div>
             </motion.div>
         </div>
