@@ -30,3 +30,5 @@ export const addExpense = (data) => API.post('/add-expense', data);
 export const getExpenses = () => API.get('/get-expenses');
 export const deleteExpense = (id) => API.delete(`/expenses/${id}`);
 export const getUserExpenses = () => API.get('/expenses');
+
+

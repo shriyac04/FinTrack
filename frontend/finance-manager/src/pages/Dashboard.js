@@ -11,16 +11,21 @@ function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   // const user = location.state?.user || { name: 'Guest', createdYear: 'Unknown' };
-
+  const [budget, setBudget] = useState(5000); 
+  const [feedback, setFeedback] = useState("");
   const [user, setUser] = useState(null); // State to store user data
   const [incomes, setIncomes] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  //const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Retrieve saved preference from localStorage
+    const savedPreference = localStorage.getItem("darkMode");
+    return savedPreference === "true"; // Convert string to boolean
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [userName, setUserName] = useState();
   const [editableName, setEditableName] = useState();
@@ -29,6 +34,24 @@ function Dashboard() {
     console.log("re rendered");
     fetchData();
   },[]);
+
+  useEffect(() => {
+    console.log("in dark mode walaa");
+    // Apply or remove the dark mode class on the body element
+    if (isDarkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+
+    // Save preference to localStorage
+    localStorage.setItem("darkMode", isDarkMode);
+  }, isDarkMode);
+
+  const toggleDarkMode = () => {
+    console.log("chal gya dark ")
+    setIsDarkMode((prevMode) => !prevMode);
+  };
 
   const fetchData = async () => {
   try {
@@ -156,6 +179,20 @@ function Dashboard() {
   //     categories[category] = (categories[category] || 0) + amount;
   //     return categories;
   // }, {});
+  useEffect(() => {
+    // Update feedback based on budget utilization
+    if (totalExpense > budget) {
+      setFeedback("You are over budget!");
+    } else {
+      setFeedback("You are within your budget!");
+    }
+  }, [budget, totalExpense]);
+
+  const handleBudgetChange = (e) => {
+    setBudget(e.target.value);
+  };
+
+
 
   const pieData = {
     labels: Object.keys(expenseCategories),
@@ -209,7 +246,7 @@ function Dashboard() {
               <input
                 type="checkbox"
                 checked={isDarkMode}
-                onChange={() => setIsDarkMode(!isDarkMode)}
+                onChange={() => toggleDarkMode}
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
@@ -357,15 +394,15 @@ function Dashboard() {
 
 </div>
 {/* Charts Section */}
-<div className="flex flex-wrap p-4 ml-4">
-  {/* Card 1 */}
+<div className="flex flex-wrap p-4 ml-4 gap-1.">
+  {/* Income vs Expenses Chart */}
   <div
     className="p-5 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
     style={{
       maxWidth: "400px",
       height: "400px",
       overflow: "hidden",
-      marginRight: "20px", // Custom gap between the two cards
+      marginRight: "20px",
     }}
   >
     <h3 className="text-md font-bold mb-2">Income vs Expenses</h3>
@@ -383,7 +420,7 @@ function Dashboard() {
     />
   </div>
 
-  {/* Card 2 */}
+  {/* Expense Breakdown */}
   <div
     className="p-5 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
     style={{
@@ -406,10 +443,99 @@ function Dashboard() {
       }}
     />
   </div>
+{/* Budget and Balance Updates Section */}
+<div className="flex flex-wrap gap-10 justify-between p-4 gap-12 ">
+  {/* Budget Card */}
+  <div
+    className={`p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg ${
+      isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+    } w-77`}
+  >
+    <h2 className="text-lg font-bold mb-4 text-orange-600">Budget Manager</h2>
+    <p className="mb-2 text-lg">
+      Total Expenses: <span className="font-bold">₹{totalExpense}</span>
+    </p>
+    <input
+      type="range"
+      min="1000"
+      max="100000"
+      step="500"
+      value={budget}
+      onChange={(e) => setBudget(parseFloat(e.target.value))}
+      className="w-full mb-4"
+    />
+    <p className="mb-4 text-lg">
+      Current Budget: <span className="font-bold">₹{budget}</span>
+    </p>
+    <div
+      className={`p-2 rounded ${
+        totalExpense > budget ? "bg-red-500 text-white" : "bg-green-500 text-white"
+      }`}
+    >
+      {feedback}
+    </div>
+  </div>
+
+{/* Balance Updates Card */}
+{/* Balance Updates Card */}
+<div
+  className={`p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg ${
+    isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+  } w-80`}
+>
+  <h2 className="text-lg font-bold mb-4 text-blue-600">
+    Balance Updates
+  </h2>
+  <ul
+    className="max-h-40 overflow-y-auto space-y-4 scrollbar-hidden px-2"
+    style={{
+      scrollbarWidth: "none", // For Firefox
+      msOverflowStyle: "none", // For Internet Explorer
+      paddingRight: "10px", // Create space between elements and the scrollbar
+    }}
+  >
+    {expenses.map((expense, index) => (
+      <li
+        key={`expense-${index}`}
+        className="flex justify-between items-center p-2 bg-red-100 rounded-lg shadow-sm"
+      >
+        <span className="text-red-600 font-bold">- ₹{expense.amount}</span>
+        <span className="text-gray-600 text-sm italic">{expense.title}</span>
+      </li>
+    ))}
+    {incomes.map((income, index) => (
+      <li
+        key={`income-${index}`}
+        className="flex justify-between items-center p-2 bg-green-100 rounded-lg shadow-sm"
+      >
+        <span className="text-green-600 font-bold">+ ₹{income.amount}</span>
+        <span className="text-gray-600 text-sm italic">{income.title}</span>
+      </li>
+    ))}
+  </ul>
 </div>
 
 
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
       </div>
+      
     </div>
   );
 }

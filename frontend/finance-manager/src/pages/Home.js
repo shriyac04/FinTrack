@@ -34,7 +34,7 @@ function Home() {
     const products = [
         { title: 'Expenses', description: 'Track and categorize your spending with ease.', icon: '💸' },
         { title: 'Incomes', description: 'Record your income sources and track your earnings.', icon: '💵' },
-        { title: 'Loan Management', description: 'Manage your loans effectively.', icon: '🏦' }
+        { title: 'Budget Tracking', description: 'Manage and track your budget.', icon: '💰' }
     ];
 
     return (
