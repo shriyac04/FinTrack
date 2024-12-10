@@ -34,7 +34,7 @@ const Sidebar = ({ sidebarOpen, handleLogout }) => {
                     <button
                         
                         className="w-full bg-red-600 text-white px-4 py-2 rounded-md shadow hover:bg-red-700 transition"
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/login')}
                     >
                         Logout
                     </button>
