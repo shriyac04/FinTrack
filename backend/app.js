@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const transactionRoutes = require('./routes/transactions'); // Transactions Routes
 const userRoutes = require('./routes/user'); // User Authentication Routes
+
 require('dotenv').config();
 
 const app = express();

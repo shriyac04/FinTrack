@@ -31,4 +31,9 @@ export const getExpenses = () => API.get('/get-expenses');
 export const deleteExpense = (id) => API.delete(`/expenses/${id}`);
 export const getUserExpenses = () => API.get('/expenses');
 
+//budget
+//export const addBudget=(data)=> API.post('/budget',data);
 
+export const updateBudget = (data) => API.post('/budget', data);
+
+export const getBudget = () => API.get('/getBudget');

@@ -8,7 +8,6 @@ const Navbar = ({ isDarkMode, setIsDarkMode, toggleSidebar, sidebarOpen }) => {
 
     // Fetch user data on mount
     useEffect(() => {
-        setIsDarkMode(localStorage.getItem("theme"));
         const fetchUser = async () => {
             try {
                 const userResponse = await userData();
@@ -29,22 +28,12 @@ const Navbar = ({ isDarkMode, setIsDarkMode, toggleSidebar, sidebarOpen }) => {
 
     // Update clock every second
     useEffect(() => {
-        
         const interval = setInterval(() => {
             setCurrentTime(new Date());
         }, 1000);
 
         return () => clearInterval(interval); // Clear interval on unmount
     }, []);
-
-    useEffect(()=>{
-        localStorage.setItem("theme",isDarkMode);
-
-    },isDarkMode)
-
-
-
-
 
     // Format time and date
     const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });

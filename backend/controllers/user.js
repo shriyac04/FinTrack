@@ -133,3 +133,48 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
+
+//adding budget 
+
+exports.updateBudget=async(req,res)=>{
+  const {budget}=req.body;
+  const id=req.user.id;
+  console.log(`USER ID : ${id}`);
+  
+  try{
+    if(!budget){
+      return res.status(400).json({message:'Budget is required'})
+    }
+    const user=await User.findByIdAndUpdate(id,{budget}, {new:true});
+    if(!user){
+      return res.status(404).json({message:'User not found'})
+
+    }
+    else{
+      return res.status(200).json({message:'Budget updated successfully',user})
+    }
+  }
+  catch(error){
+    console.log(error)
+    res.status(500).json({ message: 'Internal server error', error: error.message });  
+  }
+  
+}
+
+
+// Fetch the current budget
+exports.getBudget = async (req, res) => {
+  const id = req.user.id; // User ID from the JWT token
+
+  try {
+    const user = await User.findById(id); // Fetch user from the database
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ budget: user.budget }); // Respond with the budget value
+  } catch (error) {
+    console.error('Error fetching budget:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};

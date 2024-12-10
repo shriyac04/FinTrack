@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { getIncomes, getExpenses, userData, getUserIncomes, getUserExpenses } from "../services/api";
+import { getIncomes, getExpenses, userData, getUserIncomes, getUserExpenses, addBudget, updateBudget, getBudget } from "../services/api";
 import { FaUserCircle, FaSun, FaMoon } from "react-icons/fa";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { format } from 'date-fns';
+import paisaHai from "../images/paisaHai.png"
+import saveMoney from "../images/saveMoney.png"
 ChartJS.register(ArcElement, Tooltip, Legend);
+
+
+
 
 function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   // const user = location.state?.user || { name: 'Guest', createdYear: 'Unknown' };
-  const [budget, setBudget] = useState(5000); 
+  const [budget, setBudget] = useState(0); 
   const [feedback, setFeedback] = useState("");
   const [user, setUser] = useState(null); // State to store user data
   const [incomes, setIncomes] = useState([]);
@@ -19,13 +24,9 @@ function Dashboard() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  //const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Retrieve saved preference from localStorage
-    const savedPreference = localStorage.getItem("darkMode");
-    return savedPreference === "true"; // Convert string to boolean
-  });
+
   const [isEditing, setIsEditing] = useState(false);
   const [userName, setUserName] = useState();
   const [editableName, setEditableName] = useState();
@@ -35,23 +36,28 @@ function Dashboard() {
     fetchData();
   },[]);
 
-  useEffect(() => {
-    console.log("in dark mode walaa");
-    // Apply or remove the dark mode class on the body element
-    if (isDarkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
+//   useEffect(() => {
+// const response=  addBudget(budget);
 
-    // Save preference to localStorage
-    localStorage.setItem("darkMode", isDarkMode);
-  }, isDarkMode);
+//   },budget);
 
-  const toggleDarkMode = () => {
-    console.log("chal gya dark ")
-    setIsDarkMode((prevMode) => !prevMode);
-  };
+useEffect(() => {
+  fetchBudget(); // Fetch budget when the component mounts
+  console.log("triggered budget");
+  
+}, []);
+
+const fetchBudget = async () => {
+  try {
+    const response = await getBudget(); // Call the API to get the budget
+    setBudget(response.data.budget); // Update the state with the fetched budget
+  } catch (error) {
+    console.error("Error fetching budget:", error.response?.data || error.message);
+  }
+};
+
+
+
 
   const fetchData = async () => {
   try {
@@ -134,7 +140,7 @@ function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("token")
-    navigate("/");
+    navigate("/login");
   };
 
   const saveName = async () => {
@@ -189,6 +195,8 @@ function Dashboard() {
   }, [budget, totalExpense]);
 
   const handleBudgetChange = (e) => {
+    console.log(e);
+    
     setBudget(e.target.value);
   };
 
@@ -246,7 +254,7 @@ function Dashboard() {
               <input
                 type="checkbox"
                 checked={isDarkMode}
-                onChange={() => toggleDarkMode}
+                onChange={() => setIsDarkMode(!isDarkMode)}
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
@@ -394,7 +402,8 @@ function Dashboard() {
 
 </div>
 {/* Charts Section */}
-<div className="flex flex-wrap p-4 ml-4 gap-1.">
+
+<div className="flex flex-wrap justify-center">
   {/* Income vs Expenses Chart */}
   <div
     className="p-5 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
@@ -443,13 +452,15 @@ function Dashboard() {
       }}
     />
   </div>
+
+
 {/* Budget and Balance Updates Section */}
-<div className="flex flex-wrap gap-10 justify-between p-4 gap-12 ">
+<div className="flex flex-wrap gap-x-4 justify-between p-4">
   {/* Budget Card */}
   <div
-    className={`p-6 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg ${
+    className={`p-6 w-80 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-lg ${
       isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
-    } w-77`}
+    }`}
   >
     <h2 className="text-lg font-bold mb-4 text-orange-600">Budget Manager</h2>
     <p className="mb-2 text-lg">
@@ -461,7 +472,15 @@ function Dashboard() {
       max="100000"
       step="500"
       value={budget}
-      onChange={(e) => setBudget(parseFloat(e.target.value))}
+      onChange={(e) => {setBudget(parseFloat(e.target.value))}}
+      onMouseUp={async () => {
+        try {
+          const response = await updateBudget({budget}); // Call your API to save the budget
+          console.log("Budget saved:", response.data);
+        } catch (error) {
+          console.error("Error saving budget:", error);
+        }
+      }}
       className="w-full mb-4"
     />
     <p className="mb-4 text-lg">
@@ -473,6 +492,9 @@ function Dashboard() {
       }`}
     >
       {feedback}
+    </div>
+    <div className="flex justify-center items-center">
+      <img src={totalExpense > budget ? saveMoney : paisaHai} alt="" className="h-40 p-5"/>
     </div>
   </div>
 
@@ -487,7 +509,7 @@ function Dashboard() {
     Balance Updates
   </h2>
   <ul
-    className="max-h-40 overflow-y-auto space-y-4 scrollbar-hidden px-2"
+    className="max-h-72 overflow-y-auto space-y-4 scrollbar-hidden px-2"
     style={{
       scrollbarWidth: "none", // For Firefox
       msOverflowStyle: "none", // For Internet Explorer
