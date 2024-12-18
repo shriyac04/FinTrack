@@ -82,13 +82,15 @@ http://localhost:Port_no
 
 **User Routes:**
 
-POST /api/users/signup – Register a new user.
-POST /api/users/login – Authenticate a user.
-Transaction Routes:
-GET /api/transactions – Fetch all transactions.
-POST /api/transactions – Add a new transaction.
-PUT /api/transactions/:id – Update an existing transaction.
-DELETE /api/transactions/:id – Remove a transaction.
+- POST /api/users/signup – Register a new user.
+- POST /api/users/login – Authenticate a user.
+**Transaction Routes:**
+- GET /api/incomes – Fetch all user's income.
+- POST /api/add-income – Add a new income.
+- DELETE /api/delete-income/:id – Remove an income.
+- GET /api/expenses – Fetch all expenses.
+- POST /api/add-expense – Add a new transaction.
+- DELETE /api/delete-expense/:id – Remove a transaction.
 
 
 ## About The Developer 
