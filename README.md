@@ -11,6 +11,7 @@ FinTrack is a comprehensive finance management application designed to help user
   * API Testing: Postman
 
 ** Features: **
+
 **1. User Authentication:**
  * Secure login and signup system using encryption (e.g., bcrypt for hashing passwords).
   * JWT-based token authentication for secure session management.
