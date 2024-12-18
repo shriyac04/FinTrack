@@ -46,12 +46,14 @@ cd fintrack
 ```c
 cd backend
 ```
-```c npm install```
+```c
+npm install
+```
 
 **Set up environment variables:**
 Create a .env file in the backend folder with the following keys:
 
-PORT=Port-no
+PORT=Port_no
 MONGO_URI=your-momgodb-url
 JWT_SECRET=your-secret-key
 
@@ -74,11 +76,12 @@ npm start
 **Open the app in your browser:**
 
 
-http://localhost:Port-no
+http://localhost:Port_no
 
 **API Endpoints (Tested with Postman)**
 
 **User Routes:**
+
 POST /api/users/signup – Register a new user.
 POST /api/users/login – Authenticate a user.
 Transaction Routes:
@@ -86,12 +89,7 @@ GET /api/transactions – Fetch all transactions.
 POST /api/transactions – Add a new transaction.
 PUT /api/transactions/:id – Update an existing transaction.
 DELETE /api/transactions/:id – Remove a transaction.
-Future Enhancements
-Add budget management features to track spending limits.
-Implement notifications for overspending.
-Integrate payment gateways for direct expense tracking.
-Export financial reports in PDF or Excel formats.
-Add multi-currency support.
+
 
 ## About The Developer 
 This project was created as a learning experience to explore modern web development practices. Building FinTrack helped me improve my skills in full-stack development and understand the nuances of creating robust, secure applications.
