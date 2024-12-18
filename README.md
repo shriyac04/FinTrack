@@ -93,6 +93,6 @@ Integrate payment gateways for direct expense tracking.
 Export financial reports in PDF or Excel formats.
 Add multi-currency support.
 
-##About The Developer 
+## About The Developer 
 This project was created as a learning experience to explore modern web development practices. Building FinTrack helped me improve my skills in full-stack development and understand the nuances of creating robust, secure applications.
 
