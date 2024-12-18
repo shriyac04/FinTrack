@@ -10,7 +10,7 @@ FinTrack is a comprehensive finance management application designed to help user
   * Database: MongoDB
   * API Testing: Postman
 
-** Features: **
+**Features:**
 
 **1. User Authentication:**
  * Secure login and signup system using encryption (e.g., bcrypt for hashing passwords).
