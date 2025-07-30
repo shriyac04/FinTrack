@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Configure Axios instance
 const API = axios.create({
-  baseURL: 'http://localhost:5001/api', // Replace with your backend's base URL
+  //baseURL: 'http://localhost:5001/api', // Replace with your backend's base URL
+  baseURL: 'https://fintrack-backend-1vlm.onrender.com/api',
   withCredentials:true
 });
 
