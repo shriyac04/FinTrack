@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:3000",
+  //origin: "http://localhost:3000",
+  origin: "https://fintrack-4k0v.onrender.com",
   credentials: true
 }));
 app.use(express.json());
